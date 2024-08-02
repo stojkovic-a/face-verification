@@ -11,14 +11,34 @@ class FaceNet(nn.Module):
         self.c1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
         self.c2 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.c3 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.short1 = nn.Sequential()
-
         self.c4 = nn.Conv2d(64, 64, kernel_size=3, padding=1)  # 512x512
+
+        self.short1 = nn.Sequential()
         self.mp1 = nn.MaxPool2d(kernel_size=2, stride=2)  # od sad je 256x256
 
         self.c5 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
         self.c6 = nn.Conv2d(128, 128, kernel_size=3, padding=1)
-        
+        self.c7 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
+        self.c8 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
+
+        self.short2 = nn.Sequential()
+        self.mp2 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.c9 = nn.Conv2d(256, 512, kernel_size=3, padding=1)
+        self.c10 = nn.Conv2d(512, 512, kernel_size=3, padding=1)
+        self.c11 = nn.Conv2d(512, 1024, kernel_size=3, padding=1)
+        self.c12 = nn.Conv2d(1024, 1024, kernel_size=3, padding=1)
+
+        self.short3 = nn.Sequential()
+        self.mp3 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.c13 = nn.Conv2d(1024, 2048, kernel_size=3, padding=1)
+        self.c14 = nn.Conv2d(2048, 2048, kernel_size=3, padding=1)
+        self.c15 = nn.Conv2d(2048, 4096, kernel_size=3, padding=1)
+        self.c16 = nn.Conv2d(4096, 4096, kernel_size=3, padding=1)
+
+        self.short4 = nn.Sequential()
+        self.mp4 = nn.MaxPool2d(kernel_size=2, stride=2)
 
         self._initialize_weights()
 
@@ -32,11 +52,39 @@ class FaceNet(nn.Module):
 
     def forward(self, x):
         x1 = relu(self.c1(x))
-        x1 = relu(self.c2(x1))
-        x1 = self.c3(x1)
-        x1 += self.short1(x)
-        x1 = relu(x1)
+        x2 = self.c2(x1)
+        x2 += self.short1(x1)
+        x2 = relu(x2)
+        x2 = relu(self.c3(x2))
+        x2 = torch.cat([x2, x1], dim=1)
+        x2 = relu(self.c4(x2))
+        x2 = self.mp1(x2)
 
+        x2 = relu(self.c5(x2))
+        x3 = self.c6(x2)
+        x3 += self.short2(x2)
+        x3 = relu(x3)
+        x3 = relu(self.c7(x3))
+        x3 = torch.cat([x3, x2], dim=1)
+        x3 = relu(self.c8(x3))
+        x3 = self.mp2(x3)
+
+        x3 = relu(self.c9(x3))
+        x4 = self.c10(x3)
+        x4 += self.short3(x3)
+        x4 = relu(x4)
+        x4 = relu(self.c11(x4))
+        x4 = torch.cat([x4, x3], dim=1)
+        x4 = relu(self.c12(x4))
+        x4 = self.mp3(x4)
+
+        x4 = relu(self.c13(x4))
+        x5 = self.c14(x4)
+        x5 += self.short4(x4)
+        x5 = relu(x5)
+        x5 = relu(self.c15(x5))
+        x5=torch.cat([x5,x4],dim=1)
+        x5=relu(self.c16(x5))
         # xe11 = relu(self.e11(x))
         # xe12 = relu(self.e12(xe11))
         # xp1 = self.pool1(xe12)
