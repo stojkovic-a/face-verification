@@ -54,6 +54,8 @@ class LocalDataset(Dataset):
         image_names_list: list[str] = os.listdir(self._image_dir)
         self._image_files: list[str] = [
             file for file in image_names_list if file.endswith('.jpg')]
+        
+        
         # self.input_images = []
         # for i in range(start, start+count):
         #     self.input_images.append(np.asarray(
@@ -160,8 +162,8 @@ def training(model: torch.nn.Module, optimizer, scheduler, dataloaders, num_epoc
             print('model improved')
             best_loss = validation_loss
             best_model = copy.deepcopy(model.state_dict())
-            torch.save(best_model, "./Models/m3.pt")
-            with open('./Models/m3.txt', 'w') as f:
+            torch.save(best_model, "./Models/m5.pt")
+            with open('./Models/m5.txt', 'w') as f:
                 f.write(str(epoch))
                 f.write('\n')
                 f.write(str(best_loss))
@@ -178,7 +180,7 @@ def training(model: torch.nn.Module, optimizer, scheduler, dataloaders, num_epoc
         #         'scheduler_state_dict': scheduler.state_dict(),
         #         'dataloaders_state_dict': dataloaders,
         #     }, f'Training all models/genAndReal2_{epoch}')
-        with open('./Losses/l3.txt', 'a') as f1:
+        with open('./Losses/l5.txt', 'a') as f1:
             f1.write(str(train_loss))
             f1.write(' ')
             f1.write(str(validation_loss))
@@ -205,8 +207,8 @@ def train_model(model, scheduler, optimizer, dataloader, device):
         device = get_device()
         if (sample_index == 125):
             best_model = copy.deepcopy(model.state_dict())
-            torch.save(best_model, "./TempModel/m3.pt")
-            with open('./TempModel/l3.txt', 'a') as f1:
+            torch.save(best_model, "./TempModel/m5.pt")
+            with open('./TempModel/l5.txt', 'a') as f1:
                 f1.write(str(loss))
                 f1.write(' ')
             sample_index = 0
@@ -324,7 +326,7 @@ def vizualize_prediction(outputs_anchors: torch.Tensor, outputs_positives: torch
     # plt.show()
 
 
-def run(FaceNet):
+def run(FaceNet, model_path=""):
     train_index = 0
     train_count = 95897
 
@@ -336,11 +338,15 @@ def run(FaceNet):
 
     batch_size = 4
     num_epoches = 200
-    lr = 1e-3
+    lr = 5e-4
 
     device = get_device()
     # model = FaceNet(4096).to(device)
     model = FaceNet(1024).to(device)
+
+    if model_path != "":
+        print("Loading model from path")
+        model.load_state_dict(torch.load(model_path))
 
     print(model)
 
@@ -379,7 +385,7 @@ def run(FaceNet):
 def load_test_model(FaceNet, index, count):
     vector_length = 1024
     batch_size = 10
-    model_path = './Save/m3.pt'
+    model_path = './Save/m5.pt'
     dataset_image_path = '../../DS1/CASIA-WebFace_crop'
     device = get_device()
     model = FaceNet(vector_length).to(device)
